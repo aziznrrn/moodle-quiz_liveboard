@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+declare(strict_types=1);
+
 namespace quiz_liveboard;
 
 use advanced_testcase;
@@ -63,12 +65,12 @@ final class board_test extends advanced_testcase {
         $quizobj = \mod_quiz\quiz_settings::create($quiz->id, $u1->id);
         $quba = \question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
         $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
-        $attempt = quiz_create_attempt($quizobj, 1, false, $timenow, false, $u1->id);
+        $attempt = quiz_create_attempt($quizobj, 1, false, $timenow, false, (int) $u1->id);
         quiz_start_new_attempt($quizobj, $quba, $attempt, 1, $timenow);
         quiz_attempt_save_started($quizobj, $quba, $attempt);
-        $attemptobj = \mod_quiz\quiz_attempt::create($attempt->id);
+        $attemptobj = \mod_quiz\quiz_attempt::create((int) $attempt->id);
         $attemptobj->process_submitted_actions($timenow, false, [1 => ['answer' => 'frog'], 2 => ['answer' => '3.14']]);
-        $attemptobj = \mod_quiz\quiz_attempt::create($attempt->id);
+        $attemptobj = \mod_quiz\quiz_attempt::create((int) $attempt->id);
         // 4.5 calls it process_finish; 5.x renamed it to process_submit.
         if (method_exists($attemptobj, 'process_submit')) {
             $attemptobj->process_submit($timenow, false);
@@ -82,10 +84,10 @@ final class board_test extends advanced_testcase {
         $quizobj = \mod_quiz\quiz_settings::create($quiz->id, $u2->id);
         $quba = \question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
         $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
-        $attempt = quiz_create_attempt($quizobj, 1, false, $timenow, false, $u2->id);
+        $attempt = quiz_create_attempt($quizobj, 1, false, $timenow, false, (int) $u2->id);
         quiz_start_new_attempt($quizobj, $quba, $attempt, 1, $timenow);
         quiz_attempt_save_started($quizobj, $quba, $attempt);
-        $attemptobj = \mod_quiz\quiz_attempt::create($attempt->id);
+        $attemptobj = \mod_quiz\quiz_attempt::create((int) $attempt->id);
         $attemptobj->process_submitted_actions($timenow, false, [1 => ['answer' => 'frog']]);
 
         return [$quiz, $u1, $u2];
@@ -101,7 +103,7 @@ final class board_test extends advanced_testcase {
         $this->resetAfterTest(true);
         [$quiz, $u1, $u2] = $this->setup_quiz_with_attempts();
 
-        $rows = array_values(board::get_rows($quiz->id));
+        $rows = array_values(board::get_rows((int) $quiz->id));
         $this->assertCount(2, $rows);
 
         // Leader first (finished, graded).

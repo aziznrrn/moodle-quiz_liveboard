@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['answered'] = 'Terjawab';
 $string['fullscreen'] = 'Layar penuh';
+$string['liveboard'] = 'Papan Skor Langsung';
 $string['live'] = 'LANGSUNG';
 $string['placeholder'] = 'Papan skor langsung akan muncul di sini setelah ada upaya yang sedang berjalan.';
 $string['pluginname'] = 'Papan Skor Langsung';

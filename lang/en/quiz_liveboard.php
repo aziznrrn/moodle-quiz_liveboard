@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['answered'] = 'Answered';
 $string['fullscreen'] = 'Full screen';
+$string['liveboard'] = 'Live Board';
 $string['live'] = 'LIVE';
 $string['placeholder'] = 'The live scoreboard will appear here once attempts are in progress.';
 $string['pluginname'] = 'Live Board';

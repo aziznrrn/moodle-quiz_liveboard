@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+declare(strict_types=1);
+
 define('AJAX_SCRIPT', true);
 
 require_once(__DIR__ . '/../../../../config.php');
@@ -34,7 +36,7 @@ require_login($course, false, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/quiz:viewreports', $context);
 
-$quizobj = \mod_quiz\quiz_settings::create($cm->instance);
+$quizobj = \mod_quiz\quiz_settings::create((int) $cm->instance);
 $quiz = $quizobj->get_quiz();
 
 echo json_encode([
@@ -46,5 +48,5 @@ echo json_encode([
         'answered' => (int) $r->answered,
         'slots' => (int) $r->slots,
         'grade' => $r->grade === null ? null : (float) $r->grade,
-    ], \quiz_liveboard\board::get_rows($cm->instance))),
+    ], \quiz_liveboard\board::get_rows((int) $cm->instance))),
 ]);

@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'quiz_liveboard';
-$plugin->version = 2026091701;
+$plugin->version = 2026091702;
 $plugin->requires = 2024100100; // Moodle 4.5+.
 $plugin->release = 'v0.1.0';
 $plugin->maturity = MATURITY_ALPHA;

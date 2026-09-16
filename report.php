@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+declare(strict_types=1);
+
 /**
  * Live Board quiz report: a Kahoot-style projected scoreboard while students
  * take the quiz.
@@ -44,7 +46,13 @@ class quiz_liveboard_report {
     public function display($quiz, $cm, $course): void {
         global $OUTPUT, $PAGE;
 
-        echo $OUTPUT->heading(get_string('pluginname', 'quiz_liveboard'));
+        // The dispatcher does not print any header; each report prints its own
+        // (see \mod_quiz\local\reports\report_base::print_header_and_tabs()).
+        $PAGE->set_title(format_string($quiz->name));
+        $PAGE->set_heading(format_string($course->fullname));
+        echo $OUTPUT->header();
+
+        echo $OUTPUT->heading(get_string('liveboard', 'quiz_liveboard'));
         echo $OUTPUT->notification(get_string('placeholder', 'quiz_liveboard'), 'notifymessage');
         echo \html_writer::div('', 'quiz-liveboard', ['data-cmid' => $cm->id]);
 
