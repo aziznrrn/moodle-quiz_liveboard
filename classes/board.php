@@ -48,7 +48,9 @@ class board {
      * match - NOT quiz_grades, which holds the best/average grade across
      * attempts per the quiz grademethod and diverges from the overview
      * whenever a student has several attempts. In-progress rows have a
-     * null grade. Sorted: grade desc, answered desc.
+     * null grade. Preview attempts (teacher previews, log-in-as) are
+     * excluded, exactly like the overview report. Sorted: grade desc,
+     * answered desc.
      *
      * @param int $quizid the quiz id.
      * @return array list of objects: userid, name, state, timefinish, answered, slots, grade.
@@ -92,6 +94,7 @@ class board {
                           FROM {quiz_attempts}
                          WHERE quiz = :quizid
                            AND state IN ('inprogress','finished')
+                           AND preview = 0
                       GROUP BY userid) t
                     ON t.userid = la.userid AND t.mu = la.uniqueid
                   JOIN {user} u ON u.id = la.userid
