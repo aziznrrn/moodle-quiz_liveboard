@@ -54,15 +54,15 @@ final class board_test extends advanced_testcase {
         $cat = $qgen->create_question_category();
         $saq = $qgen->create_question('shortanswer', null, ['category' => $cat->id]);
         $numq = $qgen->create_question('numerical', null, ['category' => $cat->id]);
-        quiz_add_quiz_question($saq->id, $quiz);
-        quiz_add_quiz_question($numq->id, $quiz);
+        quiz_add_quiz_question((int) $saq->id, $quiz);
+        quiz_add_quiz_question((int) $numq->id, $quiz);
 
         $u1 = $dg->create_user();
         $u2 = $dg->create_user();
         $timenow = time();
 
         // User 1: answer both, submit, grade -> finished with full marks.
-        $quizobj = \mod_quiz\quiz_settings::create($quiz->id, $u1->id);
+        $quizobj = \mod_quiz\quiz_settings::create((int) $quiz->id, (int) $u1->id);
         $quba = \question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
         $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
         $attempt = quiz_create_attempt($quizobj, 1, false, $timenow, false, (int) $u1->id);
@@ -81,7 +81,7 @@ final class board_test extends advanced_testcase {
         }
 
         // User 2: start, answer one, stay in progress.
-        $quizobj = \mod_quiz\quiz_settings::create($quiz->id, $u2->id);
+        $quizobj = \mod_quiz\quiz_settings::create((int) $quiz->id, (int) $u2->id);
         $quba = \question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
         $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
         $attempt = quiz_create_attempt($quizobj, 1, false, $timenow, false, (int) $u2->id);
