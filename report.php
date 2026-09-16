@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Live Board quiz report — scaffold stub; the scoreboard lands in the
+ * Live Board quiz report - scaffold stub; the scoreboard lands in the
  * implementation tickets (see wayfinder T05/T02).
  *
  * @package    quiz_liveboard
