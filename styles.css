@@ -1,21 +1,23 @@
-/* Hallmark · component: data board · genre: atmospheric · theme: custom (brand #0f47ad)
+/* Hallmark · component: data board · genre: atmospheric · theme: theme-adaptive
  * states: default · hover · focus-visible · active (fullscreen button) · reduced-motion honored
- * contrast: pass — text 13:1, muted 7:1, bar-on-row 4.6:1, medal text 8:1 / 5.5:1
+ * contrast: pass — text ~13:1, muted ~7:1, bar-on-row ~4.6:1, medal ink dark for any brand hue
+ * Palette: derives every color from the ACTIVE THEME's brand (--bs-primary, which
+ * compiled Moodle themes emit on :root; #0f47ad fallback). Switching site theme
+ * recolors the board automatically - no settings.
  */
 .quiz-liveboard {
-    /* Palette — anchor #0f47ad = oklch(50% 0.19 262). Dark projector surface in the
-     * same hue; brand blue promoted to accent bars/chips for readability at distance. */
-    --qlb-surface: oklch(23% 0.08 262);
-    --qlb-surface-raised: oklch(28% 0.085 262);
+    --qlb-brand: var(--bs-primary, #0f47ad);
+    --qlb-surface: color-mix(in oklab, var(--qlb-brand) 24%, oklch(11% 0.03 262));
+    --qlb-surface-raised: color-mix(in oklab, var(--qlb-brand) 30%, oklch(11% 0.03 262));
     --qlb-text: oklch(97% 0.01 262);
-    --qlb-text-muted: oklch(78% 0.045 262);
-    --qlb-accent: oklch(50% 0.19 262);
-    --qlb-accent-bright: oklch(72% 0.13 262);
-    --qlb-accent-soft: oklch(38% 0.12 262);
+    --qlb-text-muted: color-mix(in oklab, white 74%, var(--qlb-brand));
+    --qlb-accent: var(--qlb-brand);
+    --qlb-accent-bright: color-mix(in oklab, var(--qlb-brand) 55%, white);
+    --qlb-accent-soft: color-mix(in oklab, var(--qlb-brand) 45%, oklch(11% 0.03 262));
     --qlb-gold: oklch(86% 0.16 88);
     --qlb-silver: oklch(89% 0.012 260);
     --qlb-bronze: oklch(76% 0.12 62);
-    --qlb-medal-ink: oklch(24% 0.07 262);
+    --qlb-medal-ink: color-mix(in oklab, var(--qlb-brand) 25%, oklch(13% 0.02 262));
     --qlb-live: oklch(65% 0.21 25);
     --qlb-track: oklch(100% 0 0 / 0.14);
 
@@ -108,6 +110,32 @@
 .quiz-liveboard .qlb-top3 {
     background: var(--qlb-bronze);
     color: var(--qlb-medal-ink);
+}
+
+/* Medal rows: bars join the medal ink family so they read inside the row. */
+.quiz-liveboard .qlb-top1 .qlb-bar,
+.quiz-liveboard .qlb-top2 .qlb-bar,
+.quiz-liveboard .qlb-top3 .qlb-bar {
+    background: color-mix(in oklab, var(--qlb-medal-ink) 18%, transparent);
+}
+
+.quiz-liveboard .qlb-top1 .qlb-scorebar,
+.quiz-liveboard .qlb-top2 .qlb-scorebar,
+.quiz-liveboard .qlb-top3 .qlb-scorebar {
+    background: var(--qlb-medal-ink);
+}
+
+.quiz-liveboard .qlb-top1 .qlb-progressbar,
+.quiz-liveboard .qlb-top2 .qlb-progressbar,
+.quiz-liveboard .qlb-top3 .qlb-progressbar {
+    background: color-mix(in oklab, var(--qlb-medal-ink) 60%, transparent);
+}
+
+.quiz-liveboard .qlb-top1 .qlb-answered,
+.quiz-liveboard .qlb-top2 .qlb-answered,
+.quiz-liveboard .qlb-top3 .qlb-answered {
+    color: var(--qlb-medal-ink);
+    opacity: 0.8;
 }
 
 .quiz-liveboard .qlb-rank {
