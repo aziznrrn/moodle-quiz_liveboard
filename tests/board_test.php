@@ -35,7 +35,6 @@ use advanced_testcase;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class board_test extends advanced_testcase {
-
     /**
      * Fixture: two-question quiz, one finished student, one halfway in-progress.
      *
@@ -68,16 +67,16 @@ final class board_test extends advanced_testcase {
         quiz_start_new_attempt($quizobj, $quba, $attempt, 1, $timenow);
         quiz_attempt_save_started($quizobj, $quba, $attempt);
         $attemptobj = \mod_quiz\quiz_attempt::create($attempt->id);
-        $attemptobj->process_submitted_actions($timenow, false,
-            [1 => ['answer' => 'frog'], 2 => ['answer' => '3.14']]);
+        $attemptobj->process_submitted_actions($timenow, false, [1 => ['answer' => 'frog'], 2 => ['answer' => '3.14']]);
         $attemptobj = \mod_quiz\quiz_attempt::create($attempt->id);
         // 4.5 calls it process_finish; 5.x renamed it to process_submit.
         if (method_exists($attemptobj, 'process_submit')) {
             $attemptobj->process_submit($timenow, false);
+            $attemptobj->process_grade_submission($timenow + 1);
         } else {
+            // 4.5: process_finish grades inline.
             $attemptobj->process_finish($timenow, false);
         }
-        $attemptobj->process_grade_submission($timenow + 1);
 
         // User 2: start, answer one, stay in progress.
         $quizobj = \mod_quiz\quiz_settings::create($quiz->id, $u2->id);
@@ -100,7 +99,7 @@ final class board_test extends advanced_testcase {
      */
     public function test_rows(): void {
         $this->resetAfterTest(true);
-        list($quiz, $u1, $u2) = $this->setup_quiz_with_attempts();
+        [$quiz, $u1, $u2] = $this->setup_quiz_with_attempts();
 
         $rows = array_values(board::get_rows($quiz->id));
         $this->assertCount(2, $rows);
