@@ -73,6 +73,9 @@ define(['jquery'], function($) {
      */
     function render(data) {
         var root = $('.quiz-liveboard');
+        if (data.rows.length > 0) {
+            $('.qlb-hint').hide();
+        }
         if (firstDraw) {
             root.html('<div class="qlb-header">'
                 + '<span class="qlb-live"><span class="qlb-dot"></span>' + esc(strings.live) + '</span>'

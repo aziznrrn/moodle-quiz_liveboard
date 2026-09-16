@@ -53,7 +53,7 @@ class quiz_liveboard_report {
         echo $OUTPUT->header();
 
         echo $OUTPUT->heading(get_string('liveboard', 'quiz_liveboard'));
-        echo $OUTPUT->notification(get_string('placeholder', 'quiz_liveboard'), 'notifymessage');
+        echo \html_writer::div(get_string('placeholder', 'quiz_liveboard'), 'alert alert-info qlb-hint', ['role' => 'alert']);
         echo \html_writer::div('', 'quiz-liveboard', ['data-cmid' => $cm->id]);
 
         $PAGE->requires->js_call_amd('quiz_liveboard/liveboard', 'init', [

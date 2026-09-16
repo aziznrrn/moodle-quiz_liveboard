@@ -6,6 +6,8 @@ subplugin. While students take a quiz, the teacher opens
 how many questions they have answered and their current grade, sorted by
 score, auto-refreshing every 5 seconds.
 
+![Live Board with a full cohort](docs/screenshots/liveboard.png)
+
 ## Features
 
 - Ranked rows: position, name, score bar (finished) or progress bar
@@ -16,6 +18,30 @@ score, auto-refreshing every 5 seconds.
 - Teacher-only via the default `mod/quiz:viewreports` gate. Zero settings.
 - UI in English and Indonesian. Moodle 4.5 (LTS) → 5.2, CI matrix on
   mariadb + pgsql for every branch.
+
+## Screens
+
+### Presentation mode
+
+The Full screen button turns the whole viewport into the projector view -
+scaled-up names, ranks and scores, board chrome only.
+
+![Presentation mode](docs/screenshots/liveboard-fullscreen.png)
+
+### A small class
+
+Three students mid-quiz: medal rows for the podium, blue bars for finished
+scores, muted bars for attempts still in progress (grade lands at submit
+with the default deferred-feedback behavior).
+
+![Small class](docs/screenshots/liveboard-small.png)
+
+### Waiting for the first attempts
+
+Before anyone starts, the board shows a waiting note; it disappears as soon
+as the first attempt lands.
+
+![Empty state](docs/screenshots/liveboard-empty.png)
 
 ## How it works
 
