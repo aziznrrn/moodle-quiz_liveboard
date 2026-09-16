@@ -51,10 +51,19 @@ class board {
     public static function get_rows(int $quizid): array {
         global $DB;
 
-        list($answeredsql, $eparams) = $DB->get_in_or_equal(
-            ['complete', 'gradedright', 'gradedwrong', 'gradedpartial',
-             'mangrright', 'mangrwrong', 'mangrpartial'],
-            SQL_PARAMS_NAMED, 'ast');
+        [$answeredsql, $eparams] = $DB->get_in_or_equal(
+            [
+                'complete',
+                'gradedright',
+                'gradedwrong',
+                'gradedpartial',
+                'mangrright',
+                'mangrwrong',
+                'mangrpartial',
+            ],
+            SQL_PARAMS_NAMED,
+            'ast'
+        );
 
         $sql = "SELECT u.id AS userid,
                        CONCAT(u.firstname, ' ', u.lastname) AS name,

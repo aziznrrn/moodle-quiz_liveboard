@@ -29,7 +29,7 @@ require_once($CFG->dirroot . '/mod/quiz/lib.php');
 
 $id = required_param('id', PARAM_INT); // Course module id.
 
-list($course, $cm) = get_course_and_cm_from_cmid($id, 'quiz');
+[$course, $cm] = get_course_and_cm_from_cmid($id, 'quiz');
 require_login($course, false, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/quiz:viewreports', $context);

@@ -95,6 +95,8 @@ final class board_test extends advanced_testcase {
     /**
      * Finished student shows grade + full answered count; in-progress shows
      * partial count with null grade; ordering puts the leader first.
+     *
+     * @covers \quiz_liveboard\board::get_rows
      */
     public function test_rows(): void {
         $this->resetAfterTest(true);
