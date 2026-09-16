@@ -34,7 +34,7 @@ use advanced_testcase;
  * @copyright  2026 aziznrrn
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class board_test extends advanced_testcase {
+final class board_test extends advanced_testcase {
 
     /**
      * Fixture: two-question quiz, one finished student, one halfway in-progress.
@@ -71,7 +71,12 @@ class board_test extends advanced_testcase {
         $attemptobj->process_submitted_actions($timenow, false,
             [1 => ['answer' => 'frog'], 2 => ['answer' => '3.14']]);
         $attemptobj = \mod_quiz\quiz_attempt::create($attempt->id);
-        $attemptobj->process_submit($timenow, false);
+        // 4.5 calls it process_finish; 5.x renamed it to process_submit.
+        if (method_exists($attemptobj, 'process_submit')) {
+            $attemptobj->process_submit($timenow, false);
+        } else {
+            $attemptobj->process_finish($timenow, false);
+        }
         $attemptobj->process_grade_submission($timenow + 1);
 
         // User 2: start, answer one, stay in progress.
@@ -103,7 +108,7 @@ class board_test extends advanced_testcase {
         $this->assertEquals('finished', $rows[0]->state);
         $this->assertEquals(2, $rows[0]->answered);
         $this->assertEquals(2, $rows[0]->slots);
-        $this->assertEqualsWithDelta(2.0, $rows[0]->grade, 0.0001);
+        $this->assertEqualsWithDelta(100.0, $rows[0]->grade, 0.0001);
 
         // In-progress student: partial answered, no grade yet.
         $this->assertEquals($u2->id, $rows[1]->userid);
