@@ -41,11 +41,14 @@ namespace quiz_liveboard;
  */
 class board {
     /**
-     * Per-student board rows: latest attempt's answered count + current grade.
+     * Per-student board rows for the latest attempt: answered count + grade.
      *
-     * Students are included once they have an inprogress or finished attempt;
-     * in-progress attempts contribute their answered count, finished ones their
-     * quiz_grades grade (null while ungraded). Sorted: grade desc, answered desc.
+     * Grade is the latest attempt's own grade, rescaled with the same
+     * formula as the overview report (quiz_rescale_grade) so both always
+     * match - NOT quiz_grades, which holds the best/average grade across
+     * attempts per the quiz grademethod and diverges from the overview
+     * whenever a student has several attempts. In-progress rows have a
+     * null grade. Sorted: grade desc, answered desc.
      *
      * @param int $quizid the quiz id.
      * @return array list of objects: userid, name, state, timefinish, answered, slots, grade.
@@ -80,7 +83,10 @@ class board {
                          WHERE qta.questionusageid = la.uniqueid
                            AND qas.state $answeredsql) AS answered,
                        COUNT(qta0.slot) AS slots,
-                       qg.grade
+                       CASE WHEN la.state <> 'finished' THEN NULL
+                            WHEN qz.sumgrades > 0 THEN
+                                ROUND(la.sumgrades * qz.grade / qz.sumgrades, qz.decimalpoints)
+                            ELSE 0 END AS grade
                   FROM {quiz_attempts} la
                   JOIN (SELECT userid, MAX(uniqueid) mu
                           FROM {quiz_attempts}
@@ -89,10 +95,11 @@ class board {
                       GROUP BY userid) t
                     ON t.userid = la.userid AND t.mu = la.uniqueid
                   JOIN {user} u ON u.id = la.userid
-             LEFT JOIN {quiz_grades} qg ON qg.quiz = la.quiz AND qg.userid = la.userid
+                  JOIN {quiz} qz ON qz.id = la.quiz
              LEFT JOIN {question_attempts} qta0 ON qta0.questionusageid = la.uniqueid
-              GROUP BY u.id, u.firstname, u.lastname, la.state, la.timefinish, la.uniqueid, qg.grade
-              ORDER BY qg.grade IS NULL ASC, qg.grade DESC, answered DESC, u.lastname, u.firstname";
+              GROUP BY u.id, u.firstname, u.lastname, la.state, la.timefinish, la.uniqueid,
+                       qz.grade, qz.sumgrades, qz.decimalpoints
+              ORDER BY grade IS NULL ASC, grade DESC, answered DESC, u.lastname, u.firstname";
 
         return $DB->get_records_sql($sql, array_merge(['quizid' => $quizid], $eparams));
     }

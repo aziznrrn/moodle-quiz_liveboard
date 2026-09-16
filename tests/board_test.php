@@ -119,4 +119,50 @@ final class board_test extends advanced_testcase {
         $this->assertEquals(1, $rows[1]->answered);
         $this->assertNull($rows[1]->grade);
     }
+
+    /**
+     * The grade shown is the latest attempt's own grade (like the overview
+     * report), not quiz_grades - which keeps the best attempt under the
+     * default highest-grade method and would show a stale, higher score.
+     *
+     * @covers \quiz_liveboard\board::get_rows
+     */
+    public function test_grade_is_latest_attempt_not_best(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        [$quiz, $u1] = $this->setup_quiz_with_attempts();
+
+        // Second, worse attempt for the already-finished student.
+        $quizobj = \mod_quiz\quiz_settings::create((int) $quiz->id, (int) $u1->id);
+        $quba = \question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
+        $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
+        $first = $DB->get_record('quiz_attempts', ['quiz' => $quiz->id, 'userid' => $u1->id, 'attempt' => 1]);
+        $timenow = time();
+        $attempt = quiz_create_attempt($quizobj, 2, $first, $timenow, false, (int) $u1->id);
+        quiz_start_new_attempt($quizobj, $quba, $attempt, 2, $timenow);
+        quiz_attempt_save_started($quizobj, $quba, $attempt);
+        $attemptobj = \mod_quiz\quiz_attempt::create((int) $attempt->id);
+        $attemptobj->process_submitted_actions($timenow, false, [1 => ['answer' => 'toad'], 2 => ['answer' => '9.99']]);
+        $attemptobj = \mod_quiz\quiz_attempt::create((int) $attempt->id);
+        if (method_exists($attemptobj, 'process_submit')) {
+            $attemptobj->process_submit($timenow, false);
+            $attemptobj->process_grade_submission($timenow + 1);
+        } else {
+            // 4.5: process_finish grades inline.
+            $attemptobj->process_finish($timenow, false);
+        }
+
+        // quiz_grades still holds the best attempt (100) ...
+        $this->assertEqualsWithDelta(100.0,
+            (float) $DB->get_field('quiz_grades', 'grade', ['quiz' => $quiz->id, 'userid' => $u1->id]), 0.0001);
+
+        // ... but the board shows the latest attempt's own grade, like the overview report.
+        $row = board::get_rows((int) $quiz->id)[$u1->id];
+        $this->assertEquals('finished', $row->state);
+        $sumgrades2 = (float) $DB->get_field('quiz_attempts', 'sumgrades',
+            ['quiz' => $quiz->id, 'userid' => $u1->id, 'attempt' => 2]);
+        $this->assertEqualsWithDelta($sumgrades2 * 100.0 / 2.0, (float) $row->grade, 0.0001);
+        $this->assertLessThan(100.0, (float) $row->grade);
+    }
 }

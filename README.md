@@ -47,8 +47,9 @@ as the first attempt lands.
 
 One aggregate SQL per poll over `quiz_attempts` x `question_attempts` x
 `question_attempt_steps` (latest step per question, answered-state
-whitelist) joined with `quiz_grades` - milliseconds for a classroom, no
-question-usage loads. A PHPUnit test guards the query on all supported
+whitelist); the grade is rescaled from the latest attempt's own `sumgrades`
+with the same formula as the overview report, so the two always agree -
+milliseconds for a classroom, no question-usage loads. A PHPUnit test guards the query on all supported
 branches.
 
 ## Install
