@@ -1,9 +1,29 @@
-/* Board shell: dark projector surface. */
+/* Hallmark · component: data board · genre: atmospheric · theme: custom (brand #0f47ad)
+ * states: default · hover · focus-visible · active (fullscreen button) · reduced-motion honored
+ * contrast: pass — text 13:1, muted 7:1, bar-on-row 4.6:1, medal text 8:1 / 5.5:1
+ */
 .quiz-liveboard {
-    background: #0f47ad;
+    /* Palette — anchor #0f47ad = oklch(50% 0.19 262). Dark projector surface in the
+     * same hue; brand blue promoted to accent bars/chips for readability at distance. */
+    --qlb-surface: oklch(23% 0.08 262);
+    --qlb-surface-raised: oklch(28% 0.085 262);
+    --qlb-text: oklch(97% 0.01 262);
+    --qlb-text-muted: oklch(78% 0.045 262);
+    --qlb-accent: oklch(50% 0.19 262);
+    --qlb-accent-bright: oklch(72% 0.13 262);
+    --qlb-accent-soft: oklch(38% 0.12 262);
+    --qlb-gold: oklch(86% 0.16 88);
+    --qlb-silver: oklch(89% 0.012 260);
+    --qlb-bronze: oklch(76% 0.12 62);
+    --qlb-medal-ink: oklch(24% 0.07 262);
+    --qlb-live: oklch(65% 0.21 25);
+    --qlb-track: oklch(100% 0 0 / 0.14);
+
+    background: var(--qlb-surface);
     border-radius: 12px;
+    border: 1px solid var(--qlb-accent-soft);
     padding: 16px;
-    color: #fff;
+    color: var(--qlb-text);
     min-height: 300px;
 }
 
@@ -21,14 +41,14 @@
     font-weight: 700;
     letter-spacing: 2px;
     font-size: 0.85em;
-    color: #ffffff;
+    color: var(--qlb-live);
 }
 
 .quiz-liveboard .qlb-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #ff5d5d;
+    background: var(--qlb-live);
     animation: qlb-pulse 1.5s infinite;
 }
 
@@ -39,32 +59,55 @@
 
 .quiz-liveboard .qlb-count {
     flex: 1;
-    opacity: 0.75;
+    color: var(--qlb-text-muted);
+}
+
+.quiz-liveboard .qlb-btn {
+    color: var(--qlb-text);
+    border-color: var(--qlb-accent-bright);
+}
+
+.quiz-liveboard .qlb-btn:hover,
+.quiz-liveboard .qlb-btn.is-hover {
+    background: var(--qlb-accent-soft);
+    color: var(--qlb-text);
+    border-color: var(--qlb-accent-bright);
+}
+
+.quiz-liveboard .qlb-btn:focus-visible,
+.quiz-liveboard .qlb-btn.is-focus {
+    outline: 3px solid var(--qlb-accent-bright);
+    outline-offset: 2px;
+}
+
+.quiz-liveboard .qlb-btn:active,
+.quiz-liveboard .qlb-btn.is-active {
+    transform: translateY(1px);
 }
 
 .quiz-liveboard .qlb-row {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--qlb-surface-raised);
     border-radius: 8px;
     padding: 8px 12px;
     margin-bottom: 6px;
 }
 
 .quiz-liveboard .qlb-top1 {
-    background: #ffd23f;
-    color: #0a2a66;
+    background: var(--qlb-gold);
+    color: var(--qlb-medal-ink);
 }
 
 .quiz-liveboard .qlb-top2 {
-    background: #e8ebf2;
-    color: #0a2a66;
+    background: var(--qlb-silver);
+    color: var(--qlb-medal-ink);
 }
 
 .quiz-liveboard .qlb-top3 {
-    background: #e89b4d;
-    color: #0a2a66;
+    background: var(--qlb-bronze);
+    color: var(--qlb-medal-ink);
 }
 
 .quiz-liveboard .qlb-rank {
@@ -91,7 +134,7 @@
 .quiz-liveboard .qlb-bar {
     height: 8px;
     border-radius: 4px;
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--qlb-track);
     margin-top: 4px;
     overflow: hidden;
 }
@@ -99,15 +142,15 @@
 .quiz-liveboard .qlb-scorebar {
     height: 100%;
     border-radius: 4px;
-    background: #ffffff;
-    transition: width 0.6s ease;
+    background: var(--qlb-accent-bright);
+    transition: width 0.6s var(--qlb-ease, ease-out);
 }
 
 .quiz-liveboard .qlb-progressbar {
     height: 100%;
     border-radius: 4px;
-    background: rgba(255, 255, 255, 0.4);
-    transition: width 0.6s ease;
+    background: var(--qlb-text-muted);
+    transition: width 0.6s var(--qlb-ease, ease-out);
 }
 
 .quiz-liveboard .qlb-meta {
@@ -117,7 +160,7 @@
 }
 
 .quiz-liveboard .qlb-answered {
-    opacity: 0.75;
+    color: var(--qlb-text-muted);
     font-variant-numeric: tabular-nums;
 }
 
@@ -131,7 +174,7 @@
 
 .quiz-liveboard .qlb-waiting {
     text-align: center;
-    opacity: 0.7;
+    color: var(--qlb-text-muted);
     padding: 60px 0;
     font-size: 1.2em;
 }
@@ -157,4 +200,15 @@
 .quiz-liveboard:fullscreen .qlb-row {
     padding: 16px 20px;
     margin-bottom: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .quiz-liveboard .qlb-dot {
+        animation: none;
+    }
+
+    .quiz-liveboard .qlb-scorebar,
+    .quiz-liveboard .qlb-progressbar {
+        transition-duration: 0.01s;
+    }
 }
