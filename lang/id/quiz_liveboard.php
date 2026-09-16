@@ -24,6 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Papan Skor Langsung';
 $string['placeholder'] = 'Papan skor langsung akan muncul di sini setelah ada upaya yang sedang berjalan.';
+$string['pluginname'] = 'Papan Skor Langsung';
 $string['privacy:reason'] = 'Plugin Papan Skor Langsung tidak menyimpan data pribadi apa pun; plugin ini hanya menampilkan data upaya kuis yang sudah tersimpan di Moodle.';

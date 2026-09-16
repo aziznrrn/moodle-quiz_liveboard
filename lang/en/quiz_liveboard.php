@@ -24,6 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Live Board';
 $string['placeholder'] = 'The live scoreboard will appear here once attempts are in progress.';
+$string['pluginname'] = 'Live Board';
 $string['privacy:reason'] = 'The Live Board plugin does not store any personal data; it only displays quiz attempt data already stored by Moodle.';
