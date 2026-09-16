@@ -1,6 +1,6 @@
 /* Board shell: dark projector surface. */
 .quiz-liveboard {
-    background: #2d1b4e;
+    background: #0f47ad;
     border-radius: 12px;
     padding: 16px;
     color: #fff;
@@ -21,14 +21,14 @@
     font-weight: 700;
     letter-spacing: 2px;
     font-size: 0.85em;
-    color: #ff5c8a;
+    color: #ffffff;
 }
 
 .quiz-liveboard .qlb-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #ff5c8a;
+    background: #ff5d5d;
     animation: qlb-pulse 1.5s infinite;
 }
 
@@ -46,25 +46,25 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.12);
     border-radius: 8px;
     padding: 8px 12px;
     margin-bottom: 6px;
 }
 
 .quiz-liveboard .qlb-top1 {
-    background: #f2b705;
-    color: #2d1b4e;
+    background: #ffd23f;
+    color: #0a2a66;
 }
 
 .quiz-liveboard .qlb-top2 {
-    background: #c0c0c0;
-    color: #2d1b4e;
+    background: #e8ebf2;
+    color: #0a2a66;
 }
 
 .quiz-liveboard .qlb-top3 {
-    background: #cd7f32;
-    color: #2d1b4e;
+    background: #e89b4d;
+    color: #0a2a66;
 }
 
 .quiz-liveboard .qlb-rank {
@@ -91,7 +91,7 @@
 .quiz-liveboard .qlb-bar {
     height: 8px;
     border-radius: 4px;
-    background: rgba(0, 0, 0, 0.25);
+    background: rgba(0, 0, 0, 0.2);
     margin-top: 4px;
     overflow: hidden;
 }
@@ -99,14 +99,14 @@
 .quiz-liveboard .qlb-scorebar {
     height: 100%;
     border-radius: 4px;
-    background: #5ce1e6;
+    background: #ffffff;
     transition: width 0.6s ease;
 }
 
 .quiz-liveboard .qlb-progressbar {
     height: 100%;
     border-radius: 4px;
-    background: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.4);
     transition: width 0.6s ease;
 }
 
