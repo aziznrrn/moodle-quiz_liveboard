@@ -15,8 +15,8 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Live Board quiz report - scaffold stub; the scoreboard lands in the
- * implementation tickets (see wayfinder T05/T02).
+ * Live Board quiz report: a Kahoot-style projected scoreboard while students
+ * take the quiz.
  *
  * @package    quiz_liveboard
  * @copyright  2026 aziznrrn
@@ -25,6 +25,8 @@
 
 /**
  * Live Board report class.
+ *
+ * Renders the board shell; the AMD module polls ajax.php and redraws.
  *
  * @package    quiz_liveboard
  * @copyright  2026 aziznrrn
@@ -40,8 +42,22 @@ class quiz_liveboard_report {
      * @return void (echoes output).
      */
     public function display($quiz, $cm, $course): void {
-        global $OUTPUT;
+        global $OUTPUT, $PAGE;
+
         echo $OUTPUT->heading(get_string('pluginname', 'quiz_liveboard'));
         echo $OUTPUT->notification(get_string('placeholder', 'quiz_liveboard'), 'notifymessage');
+        echo \html_writer::div('', 'quiz-liveboard', ['data-cmid' => $cm->id]);
+
+        $PAGE->requires->js_call_amd('quiz_liveboard/liveboard', 'init', [
+            (int) $cm->id,
+            (float) $quiz->grade,
+            [
+                'answered' => get_string('answered', 'quiz_liveboard'),
+                'fullscreen' => get_string('fullscreen', 'quiz_liveboard'),
+                'live' => get_string('live', 'quiz_liveboard'),
+                'score' => get_string('score', 'quiz_liveboard'),
+                'waiting' => get_string('waiting', 'quiz_liveboard'),
+            ],
+        ]);
     }
 }
