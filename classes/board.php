@@ -101,7 +101,7 @@ class board {
                   JOIN {quiz} qz ON qz.id = la.quiz
              LEFT JOIN {question_attempts} qta0 ON qta0.questionusageid = la.uniqueid
               GROUP BY u.id, u.firstname, u.lastname, la.state, la.timefinish, la.uniqueid,
-                       qz.grade, qz.sumgrades, qz.decimalpoints
+                       la.sumgrades, qz.grade, qz.sumgrades, qz.decimalpoints
               ORDER BY grade IS NULL ASC, grade DESC, answered DESC, u.lastname, u.firstname";
 
         return $DB->get_records_sql($sql, array_merge(['quizid' => $quizid], $eparams));
