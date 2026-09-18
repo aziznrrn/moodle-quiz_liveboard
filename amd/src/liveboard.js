@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Live Board front end: poll ajax.php every few seconds and redraw.
+ * Live Board front end: poll ajax.php every second and patch the board in place.
  *
  * @module quiz_liveboard/liveboard
  * @copyright 2026 aziznrrn
@@ -25,6 +25,7 @@ define(['jquery'], function($) {
     var cmid = null;
     var strings = {};
     var firstDraw = true;
+    var rowsById = {};
 
     /**
      * HTML-escape a value (names are user data).
@@ -37,33 +38,63 @@ define(['jquery'], function($) {
     }
 
     /**
-     * Build one ranked row.
+     * Build a row skeleton for one user; values are filled in by updateRow.
      *
+     * @param {Object} r row from ajax.php.
+     * @return {jQuery} row element.
+     */
+    function buildRow(r) {
+        return $('<div class="qlb-row" data-userid="' + r.userid + '">'
+            + '<div class="qlb-rank"></div>'
+            + '<div class="qlb-main">'
+            + '<div class="qlb-name">' + esc(r.name) + '</div>'
+            + '<div class="qlb-bar"><div class="qlb-progressbar" style="width:0"></div></div>'
+            + '</div>'
+            + '<div class="qlb-meta">'
+            + '<span class="qlb-answered" title="' + esc(strings.answered) + '"></span>'
+            + '<span class="qlb-score"></span>'
+            + '</div>'
+            + '</div>');
+    }
+
+    /**
+     * Update an existing row in place so CSS transitions animate the change.
+     *
+     * @param {jQuery} $row the row element.
      * @param {Number} rank 1-based position.
      * @param {Object} r row from ajax.php.
      * @param {Number} quizgrade max quiz grade.
-     * @return {String} HTML.
      */
-    function rowHtml(rank, r, quizgrade) {
+    function updateRow($row, rank, r, quizgrade) {
         var finished = r.state === 'finished' && r.grade !== null;
         var score = finished ? (Math.round(r.grade * 10) / 10) : '-';
         var barPct = finished && quizgrade > 0
             ? Math.min(100, Math.round(r.grade / quizgrade * 100))
             : (r.slots > 0 ? Math.round(r.answered / r.slots * 100) : 0);
-        var barClass = finished ? 'qlb-scorebar' : 'qlb-progressbar';
-        var posClass = rank <= 3 ? ' qlb-top' + rank : '';
 
-        return '<div class="qlb-row' + posClass + '">'
-            + '<div class="qlb-rank">' + rank + '</div>'
-            + '<div class="qlb-main">'
-            + '<div class="qlb-name">' + esc(r.name) + '</div>'
-            + '<div class="qlb-bar"><div class="' + barClass + '" style="width:' + barPct + '%"></div></div>'
-            + '</div>'
-            + '<div class="qlb-meta">'
-            + '<span class="qlb-answered" title="' + esc(strings.answered) + '">' + r.answered + '/' + r.slots + '</span>'
-            + '<span class="qlb-score">' + score + '</span>'
-            + '</div>'
-            + '</div>';
+        $row.attr('class', 'qlb-row' + (rank <= 3 ? ' qlb-top' + rank : ''));
+        $row.find('.qlb-rank').text(rank);
+        setText($row.find('.qlb-answered'), r.answered + '/' + r.slots);
+        setText($row.find('.qlb-score'), score);
+        $row.find('.qlb-bar > div')
+            .attr('class', finished ? 'qlb-scorebar' : 'qlb-progressbar')
+            .css('width', barPct + '%');
+    }
+
+    /**
+     * Set text and bump-animate when the value actually changed.
+     *
+     * @param {jQuery} $el target element.
+     * @param {String} text new text.
+     */
+    function setText($el, text) {
+        if ($el.text() === String(text)) {
+            return;
+        }
+        $el.text(text).removeClass('qlb-bump');
+        // Force restart when the same element changes twice in quick succession.
+        void $el[0].offsetWidth;
+        $el.addClass('qlb-bump');
     }
 
     /**
@@ -92,17 +123,83 @@ define(['jquery'], function($) {
             firstDraw = false;
         }
 
-        var finishedCount = data.rows.filter(function(r) {
-            return r.state === 'finished';
-        }).length;
+        var finishedCount = 0;
+        var i, r, key;
+        var $container = root.find('.qlb-rows');
+
+        if (data.rows.length === 0) {
+            rowsById = {};
+            root.find('.qlb-count').text('0 / 0');
+            $container.html('<div class="qlb-waiting">' + esc(strings.waiting) + '</div>');
+            return;
+        }
+
+        // Only reorder the DOM (and FLIP-animate) when the ranking actually changed;
+        // re-inserting rows every poll would restart their bar transitions.
+        var $kids = $container.children('.qlb-row');
+        var needsMove = $kids.length !== data.rows.length;
+        if (!needsMove) {
+            $kids.each(function(i) {
+                if (String($(this).data('userid')) !== String(data.rows[i].userid)) {
+                    needsMove = true;
+                }
+            });
+        }
+        var tops = {};
+        if (needsMove) {
+            $kids.each(function() {
+                tops[String($(this).data('userid'))] = this.getBoundingClientRect().top;
+            });
+        }
+
+        var current = {};
+        for (i = 0; i < data.rows.length; i++) {
+            r = data.rows[i];
+            if (r.state === 'finished') {
+                finishedCount++;
+            }
+            key = String(r.userid);
+            if (!rowsById[key]) {
+                var $new = buildRow(r).addClass('qlb-enter');
+                // Strip after it plays: re-appending rows on a later rank swap would replay it.
+                setTimeout(function() {
+                    $new.removeClass('qlb-enter');
+                }, 600);
+                rowsById[key] = $new;
+            }
+            updateRow(rowsById[key], i + 1, r, data.quizgrade);
+            if (needsMove) {
+                $container.append(rowsById[key]);
+            }
+            current[key] = true;
+        }
+
+        // Drop rows for users who left the board.
+        for (key in rowsById) {
+            if (!current[key]) {
+                rowsById[key].remove();
+                delete rowsById[key];
+            }
+        }
+        $container.children('.qlb-waiting').remove();
+
+        if (needsMove) {
+            // FLIP: place moved rows at their old position, then transition to 0.
+            $container.children('.qlb-row').each(function() {
+                key = String($(this).data('userid'));
+                if (!(key in tops)) {
+                    return; // New row: the qlb-enter animation covers it.
+                }
+                var dy = tops[key] - this.getBoundingClientRect().top;
+                if (dy) {
+                    $(this).css({transition: 'none', transform: 'translateY(' + dy + 'px)'});
+                    void this.offsetWidth; // Commit the start position before animating.
+                    $(this).css({transition: '', transform: ''});
+                }
+            });
+        }
 
         root.find('.qlb-count').text(data.rows.length + ' / ' + finishedCount);
-        var out = data.rows.length === 0
-            ? '<div class="qlb-waiting">' + esc(strings.waiting) + '</div>'
-            : data.rows.map(function(r, i) {
-                return rowHtml(i + 1, r, data.quizgrade);
-            }).join('');
-        root.find('.qlb-rows').html(out);
     }
 
     /**
@@ -125,7 +222,7 @@ define(['jquery'], function($) {
         cmid = courseModuleId;
         strings = lang;
         poll();
-        setInterval(poll, 5000);
+        setInterval(poll, 1000);
     }
 
     return {
