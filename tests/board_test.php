@@ -72,8 +72,14 @@ final class board_test extends advanced_testcase {
      * @param bool $finish finish and grade the attempt.
      * @return object the quiz_attempts record.
      */
-    protected function attempt_quiz(object $quiz, object $user, int $attemptno,
-            array $answers, $lastattempt = false, bool $finish = true): object {
+    protected function attempt_quiz(
+        object $quiz,
+        object $user,
+        int $attemptno,
+        array $answers,
+        $lastattempt = false,
+        bool $finish = true
+    ): object {
         $quizobj = \mod_quiz\quiz_settings::create((int) $quiz->id, (int) $user->id);
         $quba = \question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
         $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
@@ -140,16 +146,26 @@ final class board_test extends advanced_testcase {
         $first = $this->attempt_quiz($quiz, $u1, 1, [1 => ['answer' => 'frog'], 2 => ['answer' => '3.14']]);
         $this->attempt_quiz($quiz, $u1, 2, [1 => ['answer' => 'toad'], 2 => ['answer' => '9.99']], $first);
 
-        // quiz_grades still holds the best attempt (100) ...
-        $this->assertEqualsWithDelta(100.0,
-            (float) $DB->get_field('quiz_grades', 'grade', ['quiz' => $quiz->id, 'userid' => $u1->id]), 0.0001);
+        // The quiz_grades table still holds the best attempt (100) ...
+        $this->assertEqualsWithDelta(
+            100.0,
+            (float) $DB->get_field('quiz_grades', 'grade', ['quiz' => $quiz->id, 'userid' => $u1->id]),
+            0.0001
+        );
 
         // ... but the board shows the latest attempt's own grade, like the overview report.
         $row = board::get_rows((int) $quiz->id)[$u1->id];
         $this->assertEquals('finished', $row->state);
-        $sumgrades2 = (float) $DB->get_field('quiz_attempts', 'sumgrades',
-            ['quiz' => $quiz->id, 'userid' => $u1->id, 'attempt' => 2]);
-        $this->assertEqualsWithDelta($sumgrades2 * 100.0 / 2.0, (float) $row->grade, 0.0001);
+        $sumgrades2 = (float) $DB->get_field(
+            'quiz_attempts',
+            'sumgrades',
+            ['quiz' => $quiz->id, 'userid' => $u1->id, 'attempt' => 2]
+        );
+        $this->assertEqualsWithDelta(
+            $sumgrades2 * 100.0 / 2.0,
+            (float) $row->grade,
+            0.0001
+        );
         $this->assertLessThan(100.0, (float) $row->grade);
     }
 
